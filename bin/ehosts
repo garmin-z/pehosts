@@ -1,0 +1,130 @@
+#!/usr/bin/env node
+
+'use strict';
+var chalk = require('chalk')
+const sudo = require('sudo-prompt');
+const path = require('path');
+const inquirer = require('inquirer');
+
+const {
+    exec,
+    spawn
+} = require('child_process');
+const {
+    execDeploy
+} = require('../lib/index')
+const {
+    ping,
+    getIp,
+    put,
+    chooseList
+} = require('../lib/ehosts')
+var argv = require('minimist')(process.argv.slice(2), {
+    alias: {
+        tls: 'ssl',
+        smg: '-i'
+    }
+});
+
+// console.log('argv==>', argv);
+if (argv.h || argv.help) {
+    console.log([
+        'usage:ehosts [path] [options]',
+        '',
+        'options:',
+        '  -c --check   检查ip是否可以正常ping',
+        '  -i --add  向hosts导入地址 [string]',
+        '  -l --list  ip列表',
+        '  -d --delete  删除地址 [string]',
+        '  -e --exec       Print the version and exitss.',
+        '  -h --help          Print this list and exit.',
+        '  -v --version       Print the version and exit.'
+
+    ].join('\n'));
+    process.exit();
+}
+
+var arg_check = argv.c || argv.check,
+    arg_add = argv.i || argv.add,
+    arg_list = argv.l || argv.list,
+    arg_del = argv.d || argv.delete,
+    arg_exec = argv.e || argv.exec,
+    arg_version = argv.v || argv.version,
+    logger
+
+// chalk输出
+logger = {
+    info: console.log,
+    request: function (req, res, error) {
+        var date = utc ? new Date().toUTCString() : new Date();
+        var ip = argv['log-ip'] ?
+            req.headers['x-forwarded-for'] || '' + req.connection.remoteAddress :
+            '';
+        if (error) {
+            logger.info(
+                '[%s] %s "%s %s" Error (%s): "%s"',
+                date, ip, chalk.red(req.method), chalk.red(req.url),
+                chalk.red(error.status.toString()), chalk.red(error.message)
+            );
+        } else {
+            logger.info(
+                '[%s] %s "%s %s" "%s"',
+                date, ip, chalk.cyan(req.method), chalk.cyan(req.url),
+                req.headers['user-agent']
+            );
+        }
+    }
+};
+// 版本
+if (arg_version) {
+    logger.info('v' + require('../package.json').version);
+    process.exit();
+}
+const domainRxg = new RegExp(/^(?!:\/\/)([a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,63}$/)
+
+// 添加
+if (arg_add) {
+    if (!domainRxg.test(arg_add)) {
+        logger.info(chalk.red('不是一个正确的域名'));
+        return
+    }
+
+    const rootPath = path.join(__dirname, '../').split(path.sep).join('//')
+    getIp(arg_add).then(ip => {
+        const command = `node -e "const ip='${ip}',url='${arg_add}'; require('${rootPath}/lib/ehosts').put(ip, url)"`
+        sudo.exec(command, {
+            name: 'ehosts',
+        }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            console.log(stdout);
+        });
+    }).catch(error => {
+
+    })
+
+
+
+
+}
+
+// 检查
+if (arg_check) {
+    if (!domainRxg.test(arg_add)) {
+        logger.info(chalk.red('不是一个正确的域名'));
+        return
+    }
+    ping(arg_check)
+}
+
+// exec
+if (arg_exec) {
+    execDeploy()
+}
+
+if (arg_list) {
+    chooseList()
+}
