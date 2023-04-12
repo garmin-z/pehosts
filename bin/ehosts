@@ -5,6 +5,7 @@ var chalk = require('chalk')
 const sudo = require('sudo-prompt');
 const path = require('path');
 const inquirer = require('inquirer');
+const ping = require('../lib/ping');
 
 const {
     exec,
@@ -13,8 +14,8 @@ const {
 const {
     execDeploy
 } = require('../lib/index')
+const mirrorImage = require('../lib/mirror_image')
 const {
-    ping,
     getIp,
     put,
     chooseList
@@ -32,13 +33,14 @@ if (argv.h || argv.help) {
         'usage:ehosts [path] [options]',
         '',
         'options:',
-        '  -c --check   检查ip是否可以正常ping',
-        '  -i --add  向hosts导入地址 [string]',
-        '  -l --list  ip列表',
-        '  -d --delete  删除地址 [string]',
-        '  -e --exec       Print the version and exitss.',
-        '  -h --help          Print this list and exit.',
-        '  -v --version       Print the version and exit.'
+        '  -c --check    检查ip是否可以正常ping',
+        '  -i --add      向hosts导入地址 [string]',
+        '  -l --list     ip列表',
+        '  -m            mirror image',
+        '  -d --delete   删除地址 [string]',
+        '  -e --exec     Print the version and exitss.',
+        '  -h --help     Print this list and exit.',
+        '  -v --version  Print the version and exit.'
 
     ].join('\n'));
     process.exit();
@@ -50,6 +52,7 @@ var arg_check = argv.c || argv.check,
     arg_del = argv.d || argv.delete,
     arg_exec = argv.e || argv.exec,
     arg_version = argv.v || argv.version,
+    arg_mirror = argv.m,
     logger
 
 // chalk输出
@@ -113,11 +116,11 @@ if (arg_add) {
 
 // 检查
 if (arg_check) {
-    if (!domainRxg.test(arg_add)) {
+    if (!domainRxg.test(arg_check)) {
         logger.info(chalk.red('不是一个正确的域名'));
         return
     }
-    ping(arg_check)
+    ping.execute(arg_check)
 }
 
 // exec
@@ -125,6 +128,30 @@ if (arg_exec) {
     execDeploy()
 }
 
+// 列表
 if (arg_list) {
     chooseList()
+}
+
+// 镜像
+if (arg_mirror) {
+    mirrorImage.choose(arg_mirror)
+}
+
+
+if (Object.keys(argv).length === 1 && argv['_'].length === 0) {
+    console.log('argv==>', argv);
+
+    process.stdout.write(`
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+    `);
 }
