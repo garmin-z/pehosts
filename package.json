@@ -1,6 +1,6 @@
 {
   "name": "ehosts",
-  "version": "1.0.39",
+  "version": "1.0.41",
   "description": "modify hosts",
   "scripts": {
     "start": "node ./lib/index",
@@ -20,6 +20,7 @@
     "cheerio": "^1.0.0-rc.12",
     "inquirer": "^8.0.0",
     "minimist": "^1.2.8",
+    "npmlog": "^7.0.1",
     "sudo-prompt": "^9.2.1"
   },
   "engines": {
