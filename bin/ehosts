@@ -18,7 +18,8 @@ const mirrorImage = require('../lib/mirror_image')
 const {
     getIp,
     put,
-    chooseList
+    chooseList,
+    deleteRecord
 } = require('../lib/ehosts')
 var argv = require('minimist')(process.argv.slice(2), {
     alias: {
@@ -114,6 +115,16 @@ if (arg_add) {
 
 }
 
+// 删除
+if (arg_del) {
+    if (!domainRxg.test(arg_del)) {
+        log.warn('不是一个正确的域名');
+        return
+    }
+
+    deleteRecord(arg_del)
+}
+
 // 检查
 if (arg_check) {
     if (!domainRxg.test(arg_check)) {
@@ -140,12 +151,19 @@ if (arg_mirror) {
 
 
 if (Object.keys(argv).length === 1 && argv['_'].length === 0) {
-    console.log('argv==>', argv);
-    log.info('fyi', 'I have a kitty cat: %j', argv)
-    log.enableProgress()
-    log.info('install', 'Installing packages...');
-    setTimeout(() => {
-        log.disableProgress()
-    }, 3000);
+    // 设置进度条的前缀和总数
+    log.enableProgress();
+    log.total = 100;
+
+    let count = 0
+    // 更新进度条
+    const interval = setInterval(() => {
+        log.info('progress', 'Downloading...', count);
+        if (count >= log.total) {
+            clearInterval(interval);
+        }
+        count++
+    }, 100);
+
 
 }
