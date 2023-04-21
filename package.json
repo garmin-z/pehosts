@@ -1,6 +1,6 @@
 {
   "name": "ehosts",
-  "version": "1.0.51",
+  "version": "1.0.56",
   "description": "modify hosts",
   "scripts": {
     "start": "node ./lib/index",
@@ -18,6 +18,8 @@
     "axios": "^1.3.5",
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.12",
+    "crypto": "^1.0.1",
+    "express": "^4.18.2",
     "iconv-lite": "^0.6.3",
     "inquirer": "^8.0.0",
     "minimist": "^1.2.8",

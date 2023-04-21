@@ -21,6 +21,10 @@ const {
     chooseList,
     deleteRecord
 } = require('../lib/ehosts')
+
+const {
+    main
+} = require('../lib/server')
 var argv = require('minimist')(process.argv.slice(2), {
     alias: {
         tls: 'ssl',
@@ -37,6 +41,7 @@ if (argv.h || argv.help) {
         '  -c --check    检查ip是否可以正常ping',
         '  -i --add      向hosts导入地址 [string]',
         '  -l --list     ip列表',
+        '  -u --ui            ui',
         '  -m            mirror image',
         '  -d --delete   删除地址 [string]',
         '  -e --exec     Print the version and exitss.',
@@ -54,6 +59,7 @@ var arg_check = argv.c || argv.check,
     arg_exec = argv.e || argv.exec,
     arg_version = argv.v || argv.version,
     arg_mirror = argv.m,
+    arg_ui = argv.ui,
     logger
 
 // chalk输出
@@ -85,6 +91,7 @@ if (arg_version) {
     process.exit();
 }
 const domainRxg = new RegExp(/^(?!:\/\/)([a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,63}$/)
+const rootPath = path.join(__dirname, '../').split(path.sep).join('//')
 
 // 添加
 if (arg_add) {
@@ -93,26 +100,11 @@ if (arg_add) {
         return
     }
 
-    const rootPath = path.join(__dirname, '../').split(path.sep).join('//')
     getIp(arg_add).then(ip => {
-        const command = `node -e "const ip='${ip}',url='${arg_add}'; require('${rootPath}/lib/ehosts').put(ip, url)"`
-        sudo.exec(command, {
-            name: 'ehosts',
-        }, (error, stdout, stderr) => {
-            if (error) {
-                console.error(error);
-                return;
-            }
-
-            console.log(stdout);
-        });
+        put(ip, arg_add)
     }).catch(error => {
 
     })
-
-
-
-
 }
 
 // 删除
@@ -123,6 +115,16 @@ if (arg_del) {
     }
 
     deleteRecord(arg_del)
+    // const command = `node -e "const url='${arg_del}'; const {deleteRecord} = require('${rootPath}/lib/ehosts'); deleteRecord(url)"`
+    // sudo.exec(command, {
+    //     name: 'ehosts',
+    // }, (error, stdout, stderr) => {
+    //     if (error) {
+    //         console.error(error);
+    //         return;
+    //     }
+    //     console.log(stdout);
+    // });
 }
 
 // 检查
@@ -149,6 +151,10 @@ if (arg_mirror) {
     mirrorImage.choose(arg_mirror)
 }
 
+// ui界面
+if (arg_ui) {
+    main()
+}
 
 if (Object.keys(argv).length === 1 && argv['_'].length === 0) {
     // 设置进度条的前缀和总数
@@ -164,6 +170,5 @@ if (Object.keys(argv).length === 1 && argv['_'].length === 0) {
         }
         count++
     }, 100);
-
 
 }

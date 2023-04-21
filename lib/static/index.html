@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>ehosts</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="/index.css" lang="css"/>
+    <link rel="stylesheet" href="index.css"/>
+</head>
+<body>
+<div id="app">
+    <div v-cloak>
+        <div class="table-wrapper">
+            <div class="table table-bordered">
+                <div class="table-content">
+                    <table style="table-layout: auto">
+                        <colgroup>
+                            <col style="width: 30%"/>
+                        </colgroup>
+                        <thead class="table-thead">
+                        <tr>
+                            <th class="table-cell" colstart="0" colend="0">
+                                name
+                            </th>
+                            <th class="table-cell" colstart="1" colend="1">
+                                age
+                            </th>
+                            <th class="table-cell" colstart="2" colend="2">
+                                address
+                            </th>
+                            <th class="table-cell" colstart="3" colend="3">
+                                operation
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-tbody">
+                        <tr
+                                data-row-key="0"
+                                class="table-row table-row-level-0"
+                        >
+                            <td class="table-cell">
+                                <div class="editable-cell">
+                                    <div class="editable-cell-text-wrapper">
+                                        Edward King 0
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="table-cell">32</td>
+                            <td class="table-cell">
+                                London, Park Lane no. 0
+                            </td>
+                            <td class="table-cell"><a>Delete</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <button @click="submit">delete</button>
+
+    </div>
+</div>
+
+<script>
+  const { createApp, onMounted, ref } = Vue;
+  const vm = createApp({
+    setup() {
+      const message = ref('Hello ehosts');
+      onMounted(() => {
+        console.log('smfs;');
+        fetch('/api/hosts')
+          .then((r) => {
+            console.log(r);
+          });
+      });
+
+      function submit() {
+        fetch('/api/submit')
+          .then((r) => {
+            console.log(r);
+          });
+      }
+      return {
+        submit,
+        message,
+        dataSource: [
+          {
+            key: '1',
+            name: '胡彦斌',
+            age: 32,
+            address: '西湖区湖底公园1号',
+          },
+          {
+            key: '2',
+            name: '胡彦祖',
+            age: 42,
+            address: '西湖区湖底公园1号',
+          },
+        ],
+
+        columns: [
+          {
+            title: '姓名',
+            dataIndex: 'name',
+            key: 'name',
+          },
+          {
+            title: '年龄',
+            dataIndex: 'age',
+            key: 'age',
+          },
+          {
+            title: '住址',
+            dataIndex: 'address',
+            key: 'address',
+          },
+        ],
+      };
+    },
+  })
+    .mount('#app');
+</script>
+</body>
+</html>
