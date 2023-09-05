@@ -17,6 +17,7 @@ const {
 const mirrorImage = require('../lib/mirror_image')
 const {
     getIp,
+    githubPush,
     put,
     chooseList,
     deleteRecord
@@ -40,6 +41,7 @@ if (argv.h || argv.help) {
         'options:',
         '  -c --check    检查ip是否可以正常ping',
         '  -i --add      向hosts导入地址 [string]',
+        '  -g --github   向hosts导入github相关地址',
         '  -l --list     ip列表',
         '  -u --ui            ui',
         '  -m            mirror image',
@@ -54,6 +56,7 @@ if (argv.h || argv.help) {
 
 var arg_check = argv.c || argv.check,
     arg_add = argv.i || argv.add,
+    github = argv.g || argv.github,
     arg_list = argv.l || argv.list,
     arg_del = argv.d || argv.delete,
     arg_exec = argv.e || argv.exec,
@@ -101,10 +104,16 @@ if (arg_add) {
     }
 
     getIp(arg_add).then(ip => {
-        put(ip, arg_add)
+        put({
+            [arg_add]: ip
+        })
     }).catch(error => {
 
     })
+}
+
+if (github) {
+    githubPush()
 }
 
 // 删除

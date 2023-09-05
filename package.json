@@ -1,6 +1,6 @@
 {
   "name": "ehosts",
-  "version": "1.0.56",
+  "version": "1.1.11",
   "description": "modify hosts",
   "scripts": {
     "start": "node ./lib/index",
